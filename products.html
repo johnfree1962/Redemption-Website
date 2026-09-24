@@ -15,6 +15,8 @@
             flex-wrap: wrap;
         }
 
+        .category-filters { display: contents; }
+
         .product-search {
             position: relative;
             width: min(100%, 420px);
@@ -113,11 +115,7 @@
             <div class="filter-buttons">
                 <div class="product-search"><i class="fas fa-search"></i><input id="productSearch" type="search" placeholder="Search products..." aria-label="Search products"></div>
                 <button class="filter-btn active" data-filter="all">All Products</button>
-                <button class="filter-btn" data-filter="pain">Pain Relief</button>
-                <button class="filter-btn" data-filter="vitamins">Vitamins</button>
-                <button class="filter-btn" data-filter="cold">Cold & Flu</button>
-                <button class="filter-btn" data-filter="skin">Skincare</button>
-                <button class="filter-btn" data-filter="digestive">Digestive</button>
+                <div class="category-filters" id="categoryFilters"></div>
                 <button class="cart-button" id="cartButton" type="button"><i class="fas fa-basket-shopping"></i> Order now <span id="cartCount" hidden>0</span></button>
             </div>
 
@@ -422,6 +420,7 @@
     </footer>
 
     <script src="products-data.js"></script>
+    <script src="categories-data.js"></script>
     <script src="script.js"></script>
     <script src="orders-data.js"></script>
     <script src="orders.js"></script>

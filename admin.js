@@ -16,20 +16,25 @@ const imagePreview = document.getElementById('imagePreview');
 const imagePreviewImage = document.getElementById('imagePreviewImage');
 const removeImage = document.getElementById('removeImage');
 const aboutForm = document.getElementById('aboutForm');
+const productCategory = document.getElementById('productCategory');
+const newCategoryName = document.getElementById('newCategoryName');
+const addCategory = document.getElementById('addCategory');
 
 let products = window.pharmacyProducts.getProducts();
 let orders = window.pharmacyOrders.getOrders();
 let selectedImage = '';
 let aboutContent = window.pharmacyAbout.getAboutContent();
 let teamMembers = aboutContent.team.map(member => ({ ...member }));
+let categories = window.pharmacyCategories.getCategories();
 
-const categoryNames = {
-    pain: 'Pain relief',
-    vitamins: 'Vitamins',
-    cold: 'Cold & flu',
-    skin: 'Skincare',
-    digestive: 'Digestive'
-};
+function renderCategoryOptions(selectedCategory = productCategory.value) {
+    productCategory.innerHTML = categories.map(category => `<option value="${escapeAdminText(category.id)}">${escapeAdminText(category.name)}</option>`).join('');
+    if (categories.some(category => category.id === selectedCategory)) productCategory.value = selectedCategory;
+}
+
+function getCategoryName(categoryId) {
+    return categories.find(category => category.id === categoryId)?.name || categoryId;
+}
 
 function showToast(message) {
     toast.textContent = message;
@@ -49,7 +54,7 @@ function renderTable() {
 
     productTableBody.innerHTML = visibleProducts.length ? visibleProducts.map(product => `
         <tr>
-            <td><div class="product-name">${escapeAdminText(product.name)}</div><div class="product-category">${escapeAdminText(categoryNames[product.category] || product.category)}</div></td>
+            <td><div class="product-name">${escapeAdminText(product.name)}</div><div class="product-category">${escapeAdminText(getCategoryName(product.category))}</div></td>
             <td>$${Number(product.price).toFixed(2)}</td>
             <td><span class="stock ${Number(product.stock) < 10 ? 'low' : ''}">${Number(product.stock)} units</span></td>
             <td><div class="row-actions"><button class="icon-btn" type="button" data-edit="${product.id}" title="Edit product"><i class="fas fa-pen"></i></button><button class="icon-btn delete" type="button" data-delete="${product.id}" title="Delete product"><i class="fas fa-trash"></i></button></div></td>
@@ -176,6 +181,31 @@ aboutForm.addEventListener('submit', event => {
 function escapeAdminText(value) {
     return String(value).replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character]));
 }
+
+addCategory.addEventListener('click', () => {
+    const name = newCategoryName.value.trim();
+    const id = window.pharmacyCategories.categoryIdFromName(name);
+    if (!name || !id) {
+        showToast('Enter a category name');
+        return;
+    }
+    if (categories.some(category => category.id === id || category.name.toLowerCase() === name.toLowerCase())) {
+        showToast('That category already exists');
+        return;
+    }
+    categories.push({ id, name });
+    window.pharmacyCategories.saveCategories(categories);
+    renderCategoryOptions(id);
+    newCategoryName.value = '';
+    showToast('Category added successfully');
+});
+
+newCategoryName.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        addCategory.click();
+    }
+});
 
 function clearForm() {
     productForm.reset();
@@ -309,12 +339,16 @@ cancelEdit.addEventListener('click', clearForm);
 resetProducts.addEventListener('click', () => {
     if (!window.confirm('Restore the original demo catalog?')) return;
     products = window.pharmacyProducts.defaultProducts.map(product => ({ ...product }));
+    categories = window.pharmacyCategories.defaultCategories.map(category => ({ ...category }));
     window.pharmacyProducts.saveProducts(products);
+    window.pharmacyCategories.saveCategories(categories);
+    renderCategoryOptions();
     renderTable();
     clearForm();
     showToast('Demo catalog restored');
 });
 
 renderTable();
+renderCategoryOptions();
 renderOrders();
 fillAboutForm();

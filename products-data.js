@@ -39,6 +39,13 @@ function escapeProductText(value) {
         .replace(/'/g, '&#039;');
 }
 
+function renderCategoryFilters() {
+    const categoryFilters = document.getElementById('categoryFilters');
+    if (!categoryFilters || !window.pharmacyCategories) return;
+    const categories = window.pharmacyCategories.getCategories();
+    categoryFilters.innerHTML = categories.map(category => `<button class="filter-btn" data-filter="${escapeProductText(category.id)}">${escapeProductText(category.name)}</button>`).join('');
+}
+
 function renderPublicProducts() {
     const productsGrid = document.querySelector('.products-grid[data-product-list]');
     if (!productsGrid) return;
@@ -61,6 +68,7 @@ function renderPublicProducts() {
 
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem(PRODUCT_STORAGE_KEY)) saveProducts(defaultProducts);
+    renderCategoryFilters();
     renderPublicProducts();
 });
 
