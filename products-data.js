@@ -66,10 +66,36 @@ function renderPublicProducts() {
     document.dispatchEvent(new CustomEvent('products:rendered'));
 }
 
+function renderFeaturedProducts() {
+    const productsGrid = document.querySelector('.products-grid[data-featured-product-list]');
+    if (!productsGrid) return;
+
+    productsGrid.innerHTML = getProducts().slice(0, 4).map(product => `
+        <div class="product-card">
+            <div class="product-image">${product.image ? `<img src="${escapeProductText(product.image)}" alt="${escapeProductText(product.name)}">` : `<i class="fas ${escapeProductText(product.icon || 'fa-pills')}"></i>`}</div>
+            <h3>${escapeProductText(product.name)}</h3>
+            <p>${escapeProductText(product.description)}</p>
+            <div class="product-footer">
+                <span class="price">$${Number(product.price).toFixed(2)}</span>
+                <a class="btn-small" href="products.html">View</a>
+            </div>
+        </div>
+    `).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!localStorage.getItem(PRODUCT_STORAGE_KEY)) saveProducts(defaultProducts);
     renderCategoryFilters();
     renderPublicProducts();
+    renderFeaturedProducts();
 });
 
-window.pharmacyProducts = { defaultProducts, getProducts, saveProducts, renderPublicProducts };
+window.addEventListener('storage', event => {
+    if (event.key === PRODUCT_STORAGE_KEY) {
+        renderPublicProducts();
+        renderFeaturedProducts();
+    }
+    if (event.key === 'redemption-pharmacy-categories') renderCategoryFilters();
+});
+
+window.pharmacyProducts = { defaultProducts, getProducts, saveProducts, renderPublicProducts, renderFeaturedProducts };
