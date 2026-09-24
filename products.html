@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - REDEMPTON PHARMACY</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .product-search {
+            position: relative;
+            width: min(100%, 420px);
+            margin: 0 auto 20px;
+        }
+
+        .product-search i {
+            position: absolute;
+            top: 13px;
+            left: 14px;
+            color: #7f8c8d;
+        }
+
+        .product-search input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 2px solid #dce5e7;
+            border-radius: 25px;
+            font: inherit;
+            outline: none;
+        }
+
+        .product-search input:focus { border-color: #2c5f8d; box-shadow: 0 0 0 3px rgba(44, 95, 141, .12); }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #2c5f8d;
+            color: #2c5f8d;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #2c5f8d;
+            color: white;
+        }
+
+        .cart-button { padding: 10px 18px; color: white; background: #e74c3c; border: 2px solid #e74c3c; border-radius: 25px; cursor: pointer; font-weight: 600; }
+        .cart-button span { display: inline-grid; place-items: center; min-width: 22px; height: 22px; margin-left: 5px; color: #e74c3c; background: white; border-radius: 50%; }
+        .order-modal { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 20px; background: rgba(20, 54, 66, .65); }
+        .order-modal[hidden] { display: none; }
+        .order-dialog { position: relative; width: min(560px, 100%); max-height: 90vh; overflow-y: auto; padding: 32px; background: white; border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+        .order-dialog h2 { margin: 0 0 20px; color: #2c5f8d; }
+        .close-order { position: absolute; top: 18px; right: 18px; color: #7f8c8d; background: none; border: 0; font-size: 1.2rem; }
+        .cart-item { display: flex; justify-content: space-between; gap: 15px; padding: 12px 0; border-bottom: 1px solid #ecf0f1; }
+        .cart-item small { display: block; color: #7f8c8d; }
+        .cart-item-controls { display: flex; align-items: center; gap: 8px; }
+        .cart-item-controls button { width: 28px; height: 28px; color: #2c5f8d; background: white; border: 1px solid #dce5e7; border-radius: 4px; }
+        .cart-item-controls .remove-cart-item { color: #e74c3c; border: 0; margin-left: 5px; }
+        .empty-cart { color: #7f8c8d; }
+        .cart-total { display: flex; justify-content: space-between; padding: 18px 0; font-size: 1.15rem; }
+        .cart-total strong { color: #e74c3c; }
+        .order-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .order-fields input, .order-fields textarea { width: 100%; padding: 11px; border: 1px solid #dce5e7; border-radius: 6px; font: inherit; }
+        .order-fields textarea { grid-column: 1 / -1; min-height: 75px; resize: vertical; }
+        .order-message { padding: 10px; color: #176b51; background: #e8f7ef; border-radius: 5px; }
+        @media (max-width: 520px) { .order-fields { grid-template-columns: 1fr; } .order-fields textarea { grid-column: auto; } .order-dialog { padding: 25px 20px; } }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <i class="fas fa-pills"></i>
+                <span class="brand-name">REDEMPTION PHARMACY</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="services.html">Services</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>Our Products</h1>
+        <p>Inspire the Community by Connecting People to Real Medicine</p>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="page-content">
+        <div class="container">
+            <div class="filter-buttons">
+                <div class="product-search"><i class="fas fa-search"></i><input id="productSearch" type="search" placeholder="Search products..." aria-label="Search products"></div>
+                <button class="filter-btn active" data-filter="all">All Products</button>
+                <button class="filter-btn" data-filter="pain">Pain Relief</button>
+                <button class="filter-btn" data-filter="vitamins">Vitamins</button>
+                <button class="filter-btn" data-filter="cold">Cold & Flu</button>
+                <button class="filter-btn" data-filter="skin">Skincare</button>
+                <button class="filter-btn" data-filter="digestive">Digestive</button>
+                <button class="cart-button" id="cartButton" type="button"><i class="fas fa-basket-shopping"></i> Order now <span id="cartCount" hidden>0</span></button>
+            </div>
+
+            <!-- Products Grid -->
+            <div class="products-grid" data-product-list>
+                <!-- Pain Relief Products -->
+                <div class="product-card" data-category="pain">
+                    <div class="product-image">
+                        <i class="fas fa-capsules"></i>
+                    </div>
+                    <h3>Ibuprofen 200mg</h3>
+                    <p>Effective pain relief and fever reducer. Contains 100 tablets per box.</p>
+                    <div class="product-footer">
+                        <span class="price">$5.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="pain">
+                    <div class="product-image">
+                        <i class="fas fa-tablets"></i>
+                    </div>
+                    <h3>Acetaminophen 500mg</h3>
+                    <p>Safe and gentle pain reliever. 60 tablets. Non-aspirin formula.</p>
+                    <div class="product-footer">
+                        <span class="price">$4.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Vitamins & Supplements -->
+                <div class="product-card" data-category="vitamins">
+                    <div class="product-image">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Vitamin C 1000mg</h3>
+                    <p>Boost immunity with pure vitamin C. 30 tablets. Daily supplement.</p>
+                    <div class="product-footer">
+                        <span class="price">$8.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="vitamins">
+                    <div class="product-image">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>Multivitamin Daily</h3>
+                    <p>Complete daily vitamins and minerals. 60 tablets. All age groups.</p>
+                    <div class="product-footer">
+                        <span class="price">$12.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="vitamins">
+                    <div class="product-image">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>Vitamin D3 1000IU</h3>
+                    <p>Support bone health. 90 tablets. Essential for calcium absorption.</p>
+                    <div class="product-footer">
+                        <span class="price">$9.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Cold & Flu -->
+                <div class="product-card" data-category="cold">
+                    <div class="product-image">
+                        <i class="fas fa-mortar-pestle"></i>
+                    </div>
+                    <h3>Cold & Flu Relief</h3>
+                    <p>Multi-symptom relief formula. 24 caplets. Fast acting.</p>
+                    <div class="product-footer">
+                        <span class="price">$6.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="cold">
+                    <div class="product-image">
+                        <i class="fas fa-wind"></i>
+                    </div>
+                    <h3>Nasal Decongestant</h3>
+                    <p>Clear nasal passages. 15ml spray. Fast relief.</p>
+                    <div class="product-footer">
+                        <span class="price">$5.49</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="cold">
+                    <div class="product-image">
+                        <i class="fas fa-cough"></i>
+                    </div>
+                    <h3>Cough Syrup</h3>
+                    <p>Soothe cough and throat irritation. 120ml bottle. Cherry flavor.</p>
+                    <div class="product-footer">
+                        <span class="price">$6.49</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Skincare Products -->
+                <div class="product-card" data-category="skin">
+                    <div class="product-image">
+                        <i class="fas fa-bottle"></i>
+                    </div>
+                    <h3>Moisturizing Lotion</h3>
+                    <p>Hydrate and nourish skin. 200ml pump bottle. All skin types.</p>
+                    <div class="product-footer">
+                        <span class="price">$12.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="skin">
+                    <div class="product-image">
+                        <i class="fas fa-spa"></i>
+                    </div>
+                    <h3>Sunscreen SPF 50</h3>
+                    <p>Protect from UV rays. 100ml bottle. Water-resistant formula.</p>
+                    <div class="product-footer">
+                        <span class="price">$14.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="skin">
+                    <div class="product-image">
+                        <i class="fas spa"></i>
+                    </div>
+                    <h3>Acne Treatment Cream</h3>
+                    <p>Clear skin solution. 50ml tube. With benzoyl peroxide.</p>
+                    <div class="product-footer">
+                        <span class="price">$9.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Digestive Health -->
+                <div class="product-card" data-category="digestive">
+                    <div class="product-image">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3>Antacid Tablets</h3>
+                    <p>Fast heartburn relief. 30 chewable tablets. Mint flavor.</p>
+                    <div class="product-footer">
+                        <span class="price">$5.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="digestive">
+                    <div class="product-image">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Probiotic Supplement</h3>
+                    <p>Support gut health. 30 capsules. 10 billion CFU.</p>
+                    <div class="product-footer">
+                        <span class="price">$15.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+
+                <div class="product-card" data-category="digestive">
+                    <div class="product-image">
+                        <i class="fas fa-droplet"></i>
+                    </div>
+                    <h3>Fiber Supplement</h3>
+                    <p>Digestive wellness. 30 capsules. Natural ingredients.</p>
+                    <div class="product-footer">
+                        <span class="price">$11.99</span>
+                        <button class="btn-small">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Categories Info -->
+            <div style="background: #ecf0f1; padding: 40px; border-radius: 8px; margin-top: 50px;">
+                <h2 style="color: #2c5f8d; margin-bottom: 20px;">Product Categories</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ Prescription Medications</h4>
+                        <p>Fill your prescriptions with us - fast, safe, and reliable.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ Over-the-Counter</h4>
+                        <p>Wide selection of OTC medications and health products.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ Vitamins & Supplements</h4>
+                        <p>Essential nutrients for optimal health and wellness.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ First Aid Supplies</h4>
+                        <p>Complete first aid kits and emergency supplies.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ Medical Devices</h4>
+                        <p>Blood pressure monitors, glucose meters, and more.</p>
+                    </div>
+                    <div>
+                        <h4 style="color: #2c5f8d; margin-bottom: 10px;">✓ Personal Care</h4>
+                        <p>Hygiene and wellness products for daily use.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing & Discounts -->
+            <div style="background: linear-gradient(135deg, #2c5f8d 0%, #1e3f56 100%); color: white; padding: 40px; border-radius: 8px; margin-top: 50px; text-align: center;">
+                <h2>Special Offers</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; margin-top: 30px;">
+                    <div>
+                        <h4>🎁 Bulk Discounts</h4>
+                        <p>Buy more, save more! Up to 20% off on bulk orders.</p>
+                    </div>
+                    <div>
+                        <h4>🏷️ Loyalty Program</h4>
+                        <p>Earn points on every purchase and redeem for rewards.</p>
+                    </div>
+                    <div>
+                        <h4>📦 Free Delivery</h4>
+                        <p>Free delivery on orders over $50 within the city.</p>
+                    </div>
+                    <div>
+                        <h4>💳 Insurance Accepted</h4>
+                        <p>We accept most major health insurance plans.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-modal" id="orderModal" hidden>
+        <div class="order-dialog" role="dialog" aria-modal="true" aria-labelledby="orderTitle">
+            <button class="close-order" type="button" data-close-order aria-label="Close order form"><i class="fas fa-xmark"></i></button>
+            <p class="eyebrow">Customer order</p>
+            <h2 id="orderTitle">Complete your order</h2>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-total"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
+            <form id="orderForm">
+                <div class="order-fields"><input name="name" type="text" placeholder="Full name" aria-label="Full name" required><input name="phone" type="tel" placeholder="Phone number" aria-label="Phone number" required><input name="email" type="email" placeholder="Email address" aria-label="Email address" required><textarea name="address" placeholder="Delivery address" aria-label="Delivery address" required></textarea></div>
+                <p class="order-message" id="orderMessage" role="status" hidden></p>
+                <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Place order</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>MediCare Pharmacy</h3>
+                    <p>Your trusted partner in health and wellness since 2010.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="services.html">Services</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Operating Hours</h4>
+                    <ul>
+                        <li>Mon - Fri: 8:00 AM - 8:00 PM</li>
+                        <li>Saturday: 9:00 AM - 6:00 PM</li>
+                        <li>Sunday: 10:00 AM - 4:00 PM</li>
+                        <li>Holidays: 10:00 AM - 2:00 PM</li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact Info</h4>
+                    <ul>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@medicarepharmacy.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Health Street, Medical City, MC 12345</li>
+                        <li><i class="fas fa-clock"></i> 24/7 Emergency: +1 (555) 999-8888</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 MediCare Pharmacy. All rights reserved.</p>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script src="products-data.js"></script>
+    <script src="script.js"></script>
+    <script src="orders-data.js"></script>
+    <script src="orders.js"></script>
+</body>
+</html>

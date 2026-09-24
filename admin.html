@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Redemption Pharmacy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+    <script src="admin-auth.js"></script>
+</head>
+<body>
+    <div class="admin-shell">
+        <aside class="admin-sidebar">
+            <div class="admin-brand"><i class="fas fa-pills"></i><span>REDEMPTION<br>PHARMACY</span></div>
+            <nav class="admin-nav" aria-label="Admin navigation">
+                <a class="active" href="admin.html"><i class="fas fa-grid-2"></i> Dashboard</a>
+                <a href="#inventory"><i class="fas fa-boxes-stacked"></i> Inventory</a>
+                <a href="#orders"><i class="fas fa-receipt"></i> Orders <span class="nav-order-badge" id="navOrderCount">0</span></a>
+                <a href="#aboutContent"><i class="fas fa-circle-info"></i> About page</a>
+                <a href="products.html"><i class="fas fa-arrow-up-right-from-square"></i> View website</a>
+            </nav>
+            <p class="sidebar-note">Content changes are saved in this browser and appear on the public Products page immediately.</p>
+        </aside>
+
+        <main class="admin-main">
+            <header class="admin-topbar">
+                <div><p class="eyebrow">Pharmacy operations</p><h1>Good morning, Admin</h1><p class="subtle">Keep your online inventory accurate and ready for customers.</p></div>
+                <div class="topbar-actions"><a class="btn secondary" href="index.html"><i class="fas fa-house"></i> Home</a><button class="btn" id="resetProducts" type="button"><i class="fas fa-rotate-left"></i> Reset demo data</button><button class="btn danger" id="adminLogout" type="button"><i class="fas fa-right-from-bracket"></i> Sign out</button></div>
+            </header>
+
+            <section class="stats-row" aria-label="Inventory summary">
+                <div class="stat-box"><i class="fas fa-box"></i><p>Total products</p><strong id="totalProducts">0</strong></div>
+                <div class="stat-box"><i class="fas fa-money-bill-wave"></i><p>Inventory value</p><strong id="inventoryValue">$0.00</strong></div>
+                <div class="stat-box"><i class="fas fa-triangle-exclamation"></i><p>Low stock items</p><strong id="lowStock">0</strong></div>
+                <div class="stat-box order-stat"><i class="fas fa-receipt"></i><p>Pending orders</p><strong id="pendingOrders">0</strong></div>
+            </section>
+
+            <section class="workspace" id="inventory">
+                <div class="panel inventory-panel">
+                    <div class="panel-heading"><div><p class="eyebrow">Catalog</p><h2>Product inventory</h2></div><div class="search-box"><i class="fas fa-search"></i><input id="searchProducts" type="search" placeholder="Search products" aria-label="Search products"></div></div>
+                    <div class="table-wrap"><table><thead><tr><th>Product</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead><tbody id="productTableBody"></tbody></table></div>
+                </div>
+
+                <div class="panel form-panel">
+                    <div class="panel-heading"><div><p class="eyebrow">Content editor</p><h2 id="formTitle">Add a product</h2></div><i class="fas fa-pen-to-square subtle"></i></div>
+                    <form id="productForm">
+                        <input id="editProductId" type="hidden" name="id">
+                        <div class="field-grid">
+                            <div class="field full"><label for="productName">Product name</label><input id="productName" name="name" type="text" placeholder="e.g. Amoxicillin 500mg" required></div>
+                            <div class="field"><label for="productCategory">Category</label><select id="productCategory" name="category" required><option value="pain">Pain relief</option><option value="vitamins">Vitamins</option><option value="cold">Cold & flu</option><option value="skin">Skincare</option><option value="digestive">Digestive</option></select></div>
+                            <div class="field"><label for="productPrice">Price (USD)</label><input id="productPrice" name="price" type="number" min="0" step="0.01" placeholder="0.00" required></div>
+                            <div class="field"><label for="productStock">Stock units</label><input id="productStock" name="stock" type="number" min="0" step="1" placeholder="0" required></div>
+                            <div class="field"><label for="productIcon">Icon name</label><input id="productIcon" name="icon" type="text" value="fa-pills" placeholder="fa-pills"></div>
+                            <div class="field full"><label for="productImage">Product photo</label><input id="productImage" name="imageFile" type="file" accept="image/*"><small class="field-help">Optional. JPG, PNG, WEBP, or GIF up to 2 MB.</small><div class="image-preview" id="imagePreview" hidden><img id="imagePreviewImage" alt="Selected product preview"><button class="remove-image" id="removeImage" type="button">Remove photo</button></div></div>
+                            <div class="field full"><label for="productDescription">Description</label><textarea id="productDescription" name="description" placeholder="Short product description" required></textarea></div>
+                        </div>
+                        <div class="form-actions"><button class="btn secondary" id="cancelEdit" type="button" hidden>Cancel</button><button class="btn" type="submit"><i class="fas fa-plus"></i> Save product</button></div>
+                    </form>
+                </div>
+            </section>
+
+            <section class="panel orders-panel" id="orders">
+                <div class="panel-heading"><div><p class="eyebrow">Customer activity</p><h2>Orders module</h2><p class="subtle">Receive, review, and control every customer order from one place.</p></div><div class="order-module-actions"><span class="subtle" id="orderCount">0 orders</span><button class="btn secondary" id="refreshOrders" type="button"><i class="fas fa-rotate"></i> Refresh</button></div></div>
+                <div class="orders-list" id="ordersList"></div>
+            </section>
+
+            <section class="panel about-content-panel" id="aboutContent">
+                <div class="panel-heading"><div><p class="eyebrow">Website content</p><h2>About page editor</h2><p class="subtle">Update the information customers see on the About Us page.</p></div><a class="btn secondary" href="about.html"><i class="fas fa-arrow-up-right-from-square"></i> View page</a></div>
+                <form id="aboutForm">
+                    <div class="field-grid">
+                        <div class="field"><label for="aboutPageTitle">Page title</label><input id="aboutPageTitle" name="pageTitle" required></div>
+                        <div class="field"><label for="aboutPageSubtitle">Page subtitle</label><input id="aboutPageSubtitle" name="pageSubtitle" required></div>
+                        <div class="field full"><label for="aboutStoryTitle">Story heading</label><input id="aboutStoryTitle" name="storyTitle" required></div>
+                        <div class="field full"><label for="aboutStory">Our story</label><textarea id="aboutStory" name="story" rows="6" required></textarea><small class="field-help">Use a blank line between paragraphs.</small></div>
+                        <div class="field"><label for="aboutMission">Mission</label><textarea id="aboutMission" name="mission" required></textarea></div>
+                        <div class="field"><label for="aboutVision">Vision</label><textarea id="aboutVision" name="vision" required></textarea></div>
+                        <div class="field full"><label for="aboutValues">Values</label><textarea id="aboutValues" name="values" required></textarea></div>
+                        <div class="field full"><div class="team-editor-heading"><label>Team members</label><button class="btn secondary add-team-member" id="addTeamMember" type="button"><i class="fas fa-user-plus"></i> Add team member</button></div><div class="team-editors" id="teamEditors"></div></div>
+                        <div class="field full"><label for="aboutCommunityTitle">Community section heading</label><input id="aboutCommunityTitle" name="communityTitle" required></div>
+                        <div class="field full"><label for="aboutCommunity">Community commitment</label><textarea id="aboutCommunity" name="community" rows="5" required></textarea><small class="field-help">Use a blank line between paragraphs.</small></div>
+                    </div>
+                    <div class="form-actions"><button class="btn" type="submit"><i class="fas fa-save"></i> Save About page</button></div>
+                </form>
+            </section>
+        </main>
+    </div>
+    <div class="toast" id="toast" role="status"></div>
+    <script src="products-data.js"></script>
+    <script src="orders-data.js"></script>
+    <script src="about-data.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
