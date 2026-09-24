@@ -4,6 +4,10 @@
     box-sizing: border-box;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 :root {
     --primary-color: #2c5f8d;
     --secondary-color: #e74c3c;
@@ -19,12 +23,21 @@ body {
     line-height: 1.6;
     color: var(--dark-text);
     background-color: #fff;
+    overflow-x: hidden;
+}
+
+img,
+video {
+    display: block;
+    max-width: 100%;
+    height: auto;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    width: min(100% - 32px, 1200px);
+    padding: 0;
 }
 
 /* Navigation */
@@ -42,14 +55,20 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
 }
 
 .navbar-brand {
     display: flex;
     align-items: center;
     gap: 10px;
-    font-size: 1.5rem;
+    min-width: 0;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
     font-weight: bold;
+}
+
+.brand-name {
+    overflow-wrap: anywhere;
 }
 
 .navbar-brand i {
@@ -104,6 +123,10 @@ body {
     display: none;
     flex-direction: column;
     cursor: pointer;
+    flex: 0 0 auto;
+    padding: 8px;
+    border: 0;
+    background: transparent;
 }
 
 .hamburger span {
@@ -121,9 +144,9 @@ body {
     background-size: cover;
     background-repeat: no-repeat;
     color: white;
-    padding: 120px 20px;
+    padding: clamp(72px, 12vw, 120px) 16px;
     text-align: center;
-    min-height: 500px;
+    min-height: clamp(420px, 65vh, 600px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -134,13 +157,13 @@ body {
 }
 
 .hero h1 {
-    font-size: 3.5rem;
+    font-size: clamp(2rem, 6vw, 3.5rem);
     margin-bottom: 20px;
     font-weight: 700;
 }
 
 .hero p {
-    font-size: 1.5rem;
+    font-size: clamp(1.05rem, 2.5vw, 1.5rem);
     margin-bottom: 30px;
     opacity: 0.9;
 }
@@ -162,6 +185,7 @@ body {
     font-weight: 600;
     transition: var(--transition);
     display: inline-block;
+    min-height: 44px;
 }
 
 .btn-primary {
@@ -241,7 +265,7 @@ body {
 
 /* Services Section */
 .featured-services {
-    padding: 80px 20px;
+    padding: clamp(48px, 8vw, 80px) 0;
 }
 
 .featured-services h2,
@@ -249,7 +273,7 @@ body {
 .testimonials h2,
 .why-choose-us h2 {
     text-align: center;
-    font-size: 2.5rem;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
     color: var(--primary-color);
     margin-bottom: 50px;
 }
@@ -294,7 +318,7 @@ body {
 
 /* Featured Products */
 .featured-products {
-    padding: 80px 20px;
+    padding: clamp(48px, 8vw, 80px) 0;
     background: var(--light-bg);
 }
 
@@ -367,7 +391,7 @@ body {
 
 /* Why Choose Us */
 .why-choose-us {
-    padding: 80px 20px;
+    padding: clamp(48px, 8vw, 80px) 0;
 }
 
 .reasons-grid {
@@ -406,7 +430,7 @@ body {
 .testimonials {
     background: linear-gradient(135deg, var(--primary-color) 0%, #1e3f56 100%);
     color: white;
-    padding: 80px 20px;
+    padding: clamp(48px, 8vw, 80px) 0;
 }
 
 .testimonials h2 {
@@ -447,12 +471,12 @@ body {
 .cta {
     background: linear-gradient(135deg, var(--accent-color) 0%, #1e7e34 100%);
     color: white;
-    padding: 80px 20px;
+    padding: clamp(48px, 8vw, 80px) 16px;
     text-align: center;
 }
 
 .cta h2 {
-    font-size: 2.5rem;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
     margin-bottom: 20px;
 }
 
@@ -465,7 +489,7 @@ body {
 .footer {
     background: #2c3e50;
     color: white;
-    padding: 50px 20px 20px;
+    padding: 50px 0 20px;
 }
 
 .footer-content {
@@ -598,17 +622,17 @@ body {
 .page-header {
     background: linear-gradient(135deg, var(--primary-color) 0%, #1e3f56 100%);
     color: white;
-    padding: 60px 20px;
+    padding: clamp(42px, 8vw, 60px) 16px;
     text-align: center;
 }
 
 .page-header h1 {
-    font-size: 2.5rem;
+    font-size: clamp(1.9rem, 5vw, 2.5rem);
     margin-bottom: 10px;
 }
 
 .page-content {
-    padding: 60px 20px;
+    padding: clamp(42px, 8vw, 60px) 0;
 }
 
 .content-grid {
@@ -750,5 +774,151 @@ body {
     height: clamp(96px, 16vw, 156px);
     max-width: 100%;
     margin-bottom: 20px;
+}
+
+/* Small screens: keep navigation and content inside the viewport. */
+@media (max-width: 768px) {
+    .navbar {
+        padding: .7rem 0;
+    }
+
+    .navbar .container {
+        align-items: center;
+    }
+
+    .navbar .logo {
+        width: 42px;
+        height: 42px;
+        flex-basis: 42px;
+    }
+
+    .navbar-brand > i {
+        display: none;
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-links {
+        position: absolute;
+        top: 100%;
+        right: 16px;
+        left: 16px;
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        padding: 8px;
+        background: #1e3f56;
+        border-radius: 0 0 var(--border-radius) var(--border-radius);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, .18);
+    }
+
+    .nav-links.is-open {
+        display: flex;
+    }
+
+    .nav-links a {
+        display: block;
+        padding: 12px;
+    }
+
+    .nav-links a::after {
+        display: none;
+    }
+
+    .hero-buttons {
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .hero-buttons .btn {
+        width: min(100%, 320px);
+    }
+
+    .stats,
+    .footer {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .stats .container,
+    .services-grid,
+    .products-grid,
+    .reasons-grid,
+    .testimonials-grid,
+    .content-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .stat-card,
+    .service-card,
+    .product-card,
+    .testimonial,
+    .content-card {
+        min-width: 0;
+    }
+
+    .product-image {
+        height: clamp(130px, 35vw, 180px);
+    }
+
+    .footer-bottom,
+    .footer-bottom ul {
+        align-items: center;
+    }
+
+    .page-content .container > div[style*="grid-template-columns: 1fr 1fr"],
+    .page-content .container > div[style*="grid-template-columns: 1fr 1fr"] > div,
+    .page-content .container > div[style*="grid-template-columns: 1fr 1fr"] form {
+        min-width: 0;
+    }
+
+    .page-content .container > div[style*="grid-template-columns: 1fr 1fr"] {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 28px !important;
+    }
+
+    .page-content .container > div[style*="grid-template-columns: 1fr 1fr"] + div[style*="background: white"] > div {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: min(100% - 24px, 1200px);
+    }
+
+    .hero {
+        min-height: 460px;
+    }
+
+    .hero h1 {
+        overflow-wrap: anywhere;
+    }
+
+    .stat-card,
+    .service-card,
+    .testimonial,
+    .content-card {
+        padding: 22px 18px;
+    }
+
+    .product-card h3,
+    .product-card p {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .product-footer {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .page-content .container > div[style*="background: white"],
+    .page-content .container > div[style*="background: #ecf0f1"],
+    .page-content .container > div[style*="linear-gradient"] {
+        padding: 24px 18px !important;
+    }
 }
 
