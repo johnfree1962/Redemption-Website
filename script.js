@@ -182,13 +182,13 @@ const filterProducts = (category = activeProductCategory, searchTerm = '') => {
     });
 };
 
-// Add click handler to filter buttons if they exist
-document.querySelectorAll('[data-filter]').forEach(button => {
-    button.addEventListener('click', () => {
-        document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
-        button.classList.add('active');
-        filterProducts(button.dataset.filter, document.getElementById('productSearch')?.value || '');
-    });
+// Use delegation so filters added from saved admin categories remain interactive.
+document.addEventListener('click', event => {
+    const button = event.target.closest('[data-filter]');
+    if (!button) return;
+    document.querySelectorAll('[data-filter]').forEach(filterButton => filterButton.classList.remove('active'));
+    button.classList.add('active');
+    filterProducts(button.dataset.filter, document.getElementById('productSearch')?.value || '');
 });
 
 document.getElementById('productSearch')?.addEventListener('input', event => {
