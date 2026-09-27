@@ -4,7 +4,6 @@ const searchProducts = document.getElementById('searchProducts');
 const formTitle = document.getElementById('formTitle');
 const editProductId = document.getElementById('editProductId');
 const cancelEdit = document.getElementById('cancelEdit');
-const resetProducts = document.getElementById('resetProducts');
 const toast = document.getElementById('toast');
 const ordersList = document.getElementById('ordersList');
 const orderCount = document.getElementById('orderCount');
@@ -336,17 +335,6 @@ window.addEventListener('storage', event => {
 
 searchProducts.addEventListener('input', renderTable);
 cancelEdit.addEventListener('click', clearForm);
-resetProducts.addEventListener('click', () => {
-    if (!window.confirm('Restore the original demo catalog?')) return;
-    products = window.pharmacyProducts.defaultProducts.map(product => ({ ...product }));
-    categories = window.pharmacyCategories.defaultCategories.map(category => ({ ...category }));
-    window.pharmacyProducts.saveProducts(products);
-    window.pharmacyCategories.saveCategories(categories);
-    renderCategoryOptions();
-    renderTable();
-    clearForm();
-    showToast('Demo catalog restored');
-});
 
 renderTable();
 renderCategoryOptions();
