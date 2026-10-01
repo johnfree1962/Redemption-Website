@@ -62,6 +62,8 @@ h1 { margin: 0; font-size: clamp(1.8rem, 4vw, 2.7rem); letter-spacing: -.04em; }
 .order-admin-top { display: flex; justify-content: space-between; gap: 15px; align-items: start; }
 .order-admin-id { margin: 0 0 4px; font: 700 1rem 'Space Grotesk', sans-serif; }
 .order-admin-meta, .order-admin-items { color: var(--admin-muted); font-size: .82rem; }
+.delivery-route { display: inline-flex; gap: 6px; align-items: center; margin-top: 8px; color: var(--admin-teal-dark); font-size: .82rem; font-weight: 700; text-decoration: none; }
+.delivery-route:hover { text-decoration: underline; }
 .order-admin-items { margin: 12px 0; }
 .order-admin-bottom { display: flex; justify-content: space-between; gap: 15px; align-items: center; }
 .order-admin-total { font-weight: 700; }

@@ -6,6 +6,7 @@
     <title>Products - REDEMPTON PHARMACY</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
     <style>
         .filter-buttons {
             display: flex;
@@ -76,8 +77,14 @@
         .order-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .order-fields input, .order-fields textarea { width: 100%; padding: 11px; border: 1px solid #dce5e7; border-radius: 6px; font: inherit; }
         .order-fields textarea { grid-column: 1 / -1; min-height: 75px; resize: vertical; }
+        .delivery-location { margin: 16px 0; }
+        .delivery-location-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 8px; }
+        .delivery-location-heading label { font-weight: 600; }
+        .location-button { padding: 8px 11px; color: #2c5f8d; background: white; border: 1px solid #dce5e7; border-radius: 5px; font: inherit; cursor: pointer; white-space: nowrap; }
+        .delivery-map { height: 240px; border: 1px solid #dce5e7; border-radius: 6px; z-index: 0; }
+        .location-status { min-height: 1.25em; margin: 7px 0 0; color: #63777d; font-size: .82rem; }
         .order-message { padding: 10px; color: #176b51; background: #e8f7ef; border-radius: 5px; }
-        @media (max-width: 520px) { .order-fields { grid-template-columns: 1fr; } .order-fields textarea { grid-column: auto; } .order-dialog { padding: 25px 20px; } }
+        @media (max-width: 520px) { .order-fields { grid-template-columns: 1fr; } .order-fields textarea { grid-column: auto; } .order-dialog { padding: 25px 20px; } .delivery-map { height: 210px; } }
     </style>
 </head>
 <body>
@@ -359,7 +366,14 @@
             <div id="cartItems" class="cart-items"></div>
             <div class="cart-total"><span>Total</span><strong id="cartTotal">$0.00</strong></div>
             <form id="orderForm">
-                <div class="order-fields"><input name="name" type="text" placeholder="Full name" aria-label="Full name" required><input name="phone" type="tel" placeholder="Phone number" aria-label="Phone number" required><input name="email" type="email" placeholder="Email address" aria-label="Email address" required><textarea name="address" placeholder="Delivery address" aria-label="Delivery address" required></textarea></div>
+                <div class="order-fields"><input name="name" type="text" placeholder="Full name" aria-label="Full name" required><input name="phone" type="tel" placeholder="Phone number" aria-label="Phone number" required><input name="email" type="email" placeholder="Email address" aria-label="Email address" required><textarea name="address" placeholder="Delivery address, landmarks, or directions" aria-label="Delivery address, landmarks, or directions" required></textarea></div>
+                <section class="delivery-location" aria-labelledby="deliveryLocationLabel">
+                    <div class="delivery-location-heading"><label id="deliveryLocationLabel">Pin your delivery location *</label><button class="location-button" id="useMyLocation" type="button"><i class="fas fa-location-crosshairs"></i> Use my location</button></div>
+                    <div class="delivery-map" id="deliveryMap" role="application" aria-label="Map to choose delivery location"></div>
+                    <p class="location-status" id="locationStatus" role="status">Tap the map to place the delivery pin, or use your current location.</p>
+                    <input name="latitude" id="deliveryLatitude" type="hidden" required>
+                    <input name="longitude" id="deliveryLongitude" type="hidden" required>
+                </section>
                 <p class="order-message" id="orderMessage" role="status" hidden></p>
                 <button class="btn btn-primary" type="submit"><i class="fas fa-paper-plane"></i> Place order</button>
             </form>
@@ -423,6 +437,7 @@
     <script src="categories-data.js"></script>
     <script src="script.js"></script>
     <script src="orders-data.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="orders.js"></script>
 </body>
 </html>

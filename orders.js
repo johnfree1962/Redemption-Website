@@ -6,6 +6,55 @@ const cartItems = document.getElementById('cartItems');
 const cartTotal = document.getElementById('cartTotal');
 const orderForm = document.getElementById('orderForm');
 const orderMessage = document.getElementById('orderMessage');
+const deliveryLatitude = document.getElementById('deliveryLatitude');
+const deliveryLongitude = document.getElementById('deliveryLongitude');
+const locationStatus = document.getElementById('locationStatus');
+let deliveryMap;
+let deliveryMarker;
+let lastGeocodedAddress = '';
+let geocodeRequest = 0;
+
+function setDeliveryLocation(latitude, longitude) {
+    const point = L.latLng(latitude, longitude);
+    deliveryLatitude.value = point.lat.toFixed(6);
+    deliveryLongitude.value = point.lng.toFixed(6);
+    if (deliveryMarker) deliveryMarker.setLatLng(point);
+    else deliveryMarker = L.marker(point, { draggable: true }).addTo(deliveryMap);
+    deliveryMarker.off('dragend').on('dragend', event => {
+        const markerPoint = event.target.getLatLng();
+        setDeliveryLocation(markerPoint.lat, markerPoint.lng);
+    });
+    locationStatus.textContent = `Pinned at ${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}. Finding the street address...`;
+
+    const requestId = ++geocodeRequest;
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${point.lat}&lon=${point.lng}`)
+        .then(response => response.ok ? response.json() : Promise.reject(new Error('Address lookup unavailable')))
+        .then(result => {
+            if (requestId !== geocodeRequest) return;
+            const addressField = orderForm.elements.address;
+            const displayAddress = result.display_name || '';
+            if (displayAddress && (!addressField.value.trim() || addressField.value === lastGeocodedAddress)) {
+                addressField.value = displayAddress;
+                lastGeocodedAddress = displayAddress;
+            }
+            locationStatus.textContent = `Delivery pin set at ${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}.`;
+        })
+        .catch(() => {
+            if (requestId === geocodeRequest) locationStatus.textContent = `Delivery pin set at ${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}. Add landmarks or directions above.`;
+        });
+}
+
+function initializeDeliveryMap() {
+    if (!deliveryMap) {
+        deliveryMap = L.map('deliveryMap').setView([6.3004, -10.7969], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(deliveryMap);
+        deliveryMap.on('click', event => setDeliveryLocation(event.latlng.lat, event.latlng.lng));
+    }
+    requestAnimationFrame(() => deliveryMap.invalidateSize());
+}
 
 function formatMoney(value) {
     return `$${Number(value).toFixed(2)}`;
@@ -46,6 +95,22 @@ document.addEventListener('products:rendered', () => {
 cartButton.addEventListener('click', () => {
     orderModal.hidden = false;
     updateCart();
+    initializeDeliveryMap();
+});
+
+document.getElementById('useMyLocation').addEventListener('click', () => {
+    if (!navigator.geolocation) {
+        locationStatus.textContent = 'Location is unavailable in this browser. Tap the map to place your pin.';
+        return;
+    }
+    locationStatus.textContent = 'Finding your current location...';
+    navigator.geolocation.getCurrentPosition(position => {
+        const { latitude, longitude } = position.coords;
+        deliveryMap.setView([latitude, longitude], 17);
+        setDeliveryLocation(latitude, longitude);
+    }, () => {
+        locationStatus.textContent = 'Could not access your location. Allow location access or tap the map to place your pin.';
+    }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
 });
 
 document.querySelector('[data-close-order]')?.addEventListener('click', () => { orderModal.hidden = true; });
@@ -67,17 +132,32 @@ orderForm.addEventListener('submit', event => {
         orderMessage.hidden = false;
         return;
     }
+    if (!deliveryLatitude.value || !deliveryLongitude.value) {
+        locationStatus.textContent = 'Choose your delivery location on the map before placing the order.';
+        document.getElementById('deliveryMap').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+    }
     const formData = new FormData(orderForm);
     const order = window.pharmacyOrders.createOrder({
         name: formData.get('name').trim(),
         phone: formData.get('phone').trim(),
         email: formData.get('email').trim(),
-        address: formData.get('address').trim()
+        address: formData.get('address').trim(),
+        location: {
+            latitude: Number(formData.get('latitude')),
+            longitude: Number(formData.get('longitude'))
+        }
     }, cart.map(item => ({ ...item })));
     orderMessage.textContent = `Order ${order.id} placed successfully. We will contact you shortly.`;
     orderMessage.hidden = false;
     cart.length = 0;
     orderForm.reset();
+    if (deliveryMarker) {
+        deliveryMap.removeLayer(deliveryMarker);
+        deliveryMarker = null;
+    }
+    lastGeocodedAddress = '';
+    locationStatus.textContent = 'Tap the map to place the delivery pin, or use your current location.';
     updateCart();
     window.setTimeout(() => { orderModal.hidden = true; orderMessage.hidden = true; }, 3500);
 });
