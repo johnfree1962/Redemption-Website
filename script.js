@@ -2,22 +2,26 @@
 const hamburger = document.querySelector('.hamburger');
 const navLinks = document.querySelector('.nav-links');
 
-if (hamburger) {
+if (hamburger && navLinks) {
     hamburger.addEventListener('click', () => {
         navLinks.classList.toggle('is-open');
-        hamburger.setAttribute('aria-expanded', navLinks.classList.contains('is-open'));
+        hamburger.setAttribute('aria-expanded', String(navLinks.classList.contains('is-open')));
         hamburger.classList.toggle('active');
     });
 }
 
 // Close mobile menu when a link is clicked
-document.querySelectorAll('.nav-links a').forEach(link => {
-    link.addEventListener('click', () => {
-        navLinks.classList.remove('is-open');
-        hamburger?.setAttribute('aria-expanded', 'false');
-        hamburger.classList.remove('active');
+if (navLinks) {
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('is-open');
+            if (hamburger) {
+                hamburger.setAttribute('aria-expanded', 'false');
+                hamburger.classList.remove('active');
+            }
+        });
     });
-});
+}
 
 // Smooth Scrolling
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -36,21 +40,28 @@ const observerOptions = {
     rootMargin: '0px 0px -100px 0px'
 };
 
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
+if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
 
-// Observe elements with animation class
+    // Observe elements with animation class
 document.querySelectorAll('.service-card, .product-card, .stat-card, .reason, .testimonial')
-    .forEach(el => {
-        el.style.opacity = '0';
-        observer.observe(el);
-    });
+        .forEach(el => {
+            el.style.opacity = '0';
+            observer.observe(el);
+        });
+} else {
+    document.querySelectorAll('.service-card, .product-card, .stat-card, .reason, .testimonial')
+        .forEach(el => {
+            el.style.opacity = '1';
+        });
+}
 
 // Form submission handler
 const handleFormSubmit = (e) => {
@@ -102,20 +113,21 @@ document.querySelectorAll('form').forEach(form => {
 // Counter animation for stats
 const animateCounters = () => {
     const statCards = document.querySelectorAll('.stat-card h3');
-    
+
     statCards.forEach(card => {
-        const target = parseInt(card.textContent);
-        if (target && !isNaN(target)) {
+        const target = Number.parseInt(card.textContent, 10);
+        if (Number.isFinite(target) && target > 0) {
             const increment = target / 50;
             let current = 0;
-            
+
             const timer = setInterval(() => {
                 current += increment;
                 if (current >= target) {
-                    card.textContent = card.textContent; // Keep original text
+                    card.textContent = card.dataset.original || card.textContent;
                     clearInterval(timer);
                 } else {
-                    card.textContent = Math.floor(current) + (card.textContent.includes('+') ? '+' : '');
+                    const suffix = card.textContent.includes('+') ? '+' : '';
+                    card.textContent = `${Math.floor(current)}${suffix}`;
                 }
             }, 30);
         }
@@ -125,19 +137,28 @@ const animateCounters = () => {
 // Trigger counter animation when stats section is visible
 const statsSection = document.querySelector('.stats');
 if (statsSection) {
-    const statsObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-            animateCounters();
-            statsObserver.unobserve(statsSection);
-        }
-    }, { threshold: 0.5 });
-    
-    statsObserver.observe(statsSection);
+    document.querySelectorAll('.stat-card h3').forEach(card => {
+        card.dataset.original = card.textContent;
+    });
+
+    if ('IntersectionObserver' in window) {
+        const statsObserver = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                animateCounters();
+                statsObserver.unobserve(statsSection);
+            }
+        }, { threshold: 0.5 });
+
+        statsObserver.observe(statsSection);
+    } else {
+        animateCounters();
+    }
 }
 
 // Navbar background on scroll
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
     if (window.scrollY > 50) {
         navbar.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
     } else {
@@ -195,4 +216,6 @@ document.getElementById('productSearch')?.addEventListener('input', event => {
     filterProducts(activeProductCategory, event.target.value);
 });
 
-console.log('MediCare Pharmacy Website Loaded Successfully');
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('MediCare Pharmacy Website Loaded Successfully');
+}
